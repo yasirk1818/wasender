@@ -4,7 +4,13 @@ const mongoose = require('mongoose');
 const path = require('path');
 const session = require('express-session');
 const http = require('http');
-
+// Placeholder for Dashboard route
+app.get('/dashboard', (req, res) => {
+    if (!req.session.userId) {
+        return res.redirect('/auth/login');
+    }
+    res.send(`<h1>Welcome to Dashboard!</h1><a href="/auth/logout">Logout</a>`);
+});
 // Initialize App and Server
 const app = express();
 const server = http.createServer(app);
