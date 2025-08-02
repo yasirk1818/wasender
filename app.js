@@ -36,7 +36,6 @@ app.use(session({
     }
 }));
 
-// Global variable for views - to know user role everywhere
 app.use((req, res, next) => {
     if (req.session.userId) {
         res.locals.currentUser = {
@@ -52,11 +51,13 @@ app.use((req, res, next) => {
 // --- Routes ---
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
-const adminRoutes = require('./routes/admin'); // Import admin routes
+const adminRoutes = require('./routes/admin');
+const settingsRoutes = require('./routes/settings'); // NEW: Import settings routes
 
 app.use('/auth', authRoutes);
 app.use('/dashboard', dashboardRoutes);
-app.use('/admin', adminRoutes); // Use admin routes
+app.use('/admin', adminRoutes);
+app.use('/settings', settingsRoutes); // NEW: Use settings routes
 
 app.get('/', (req, res) => {
     if (req.session.userId) {
