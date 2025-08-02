@@ -349,3 +349,106 @@ textarea {
 #message-status.error {
     background-color: var(--error-color);
 }
+/* --- Admin Panel Styles --- */
+.table-container {
+    overflow-x: auto; /* Table ko mobile pr scrollable banaye */
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.admin-table th, .admin-table td {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.admin-table thead th {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+.admin-table tbody tr:nth-of-type(even) {
+    background-color: var(--secondary-bg);
+}
+
+.admin-table tbody tr:hover {
+    background-color: #3a3a3a;
+}
+
+.btn-edit {
+    background-color: #ffc107;
+    color: black;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+/* Flash message for success/error after update */
+.flash-message {
+    padding: 15px;
+    border-radius: 5px;
+    color: white;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.flash-message.success { background-color: var(--success-color); }
+.flash-message.error { background-color: var(--error-color); }
+
+/* Responsive Table for Mobile */
+@media screen and (max-width: 768px) {
+    .admin-table thead {
+        display: none;
+    }
+    .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
+        display: block;
+        width: 100%;
+    }
+    .admin-table tr {
+        margin-bottom: 15px;
+    }
+    .admin-table td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+        border-bottom: 0;
+    }
+    .admin-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        width: calc(50% - 20px);
+        padding-right: 10px;
+        text-align: left;
+        font-weight: bold;
+    }
+    .admin-table td:last-child {
+        border-bottom: 1px solid var(--border-color);
+    }
+}
