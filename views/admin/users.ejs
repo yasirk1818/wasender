@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Users</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <h1>Admin Panel</h1>
+        <div>
+            <a href="/dashboard" class="btn-secondary">Back to Dashboard</a>
+            <a href="/auth/logout" class="btn-logout">Logout</a>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <div class="card">
+            <div class="card-header">
+                <h2>All Users</h2>
+            </div>
+            <div class="card-content">
+                <% if (typeof message !== 'undefined' && message) { %>
+                    <div class="flash-message <%= message.type %>"><%= message.text %></div>
+                <% } %>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Expiry Date</th>
+                                <th>Device Limit</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(user => { %>
+                                <tr>
+                                    <td data-label="Username"><%= user.username %></td>
+                                    <td data-label="Role"><%= user.role %></td>
+                                    <td data-label="Status"><span class="device-status status-<%= user.status %>"><%= user.status %></span></td>
+                                    <td data-label="Expiry Date"><%= new Date(user.expiryDate).toLocaleDateString() %></td>
+                                    <td data-label="Device Limit"><%= user.deviceLimit %></td>
+                                    <td data-label="Actions">
+                                        <a href="/admin/edit-user/<%= user._id %>" class="btn-edit">Edit</a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
