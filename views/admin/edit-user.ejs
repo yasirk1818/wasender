@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User - <%= user.username %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <h1>Admin Panel</h1>
+        <a href="/admin/users" class="btn-secondary">Back to User List</a>
+    </header>
+
+    <main class="dashboard-container">
+        <div class="card">
+            <div class="card-header">
+                <h2>Edit User: <span style="color: var(--primary-accent);"><%= user.username %></span></h2>
+            </div>
+            <div class="card-content">
+                <form action="/admin/edit-user/<%= user._id %>" method="POST">
+                    <div class="input-group">
+                        <label for="expiryDate">Expiry Date</label>
+                        <input type="date" id="expiryDate" name="expiryDate" value="<%= user.expiryDate.toISOString().split('T')[0] %>" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="status">User Status</label>
+                        <select id="status" name="status" required>
+                            <option value="active" <%= user.status === 'active' ? 'selected' : '' %>>Active</option>
+                            <option value="inactive" <%= user.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+                            <option value="expired" <%= user.status === 'expired' ? 'selected' : '' %>>Expired</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="deviceLimit">Device Limit</label>
+                        <input type="number" id="deviceLimit" name="deviceLimit" value="<%= user.deviceLimit %>" min="0" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="smsSendLimit">SMS Send Limit (Daily)</label>
+                        <input type="number" id="smsSendLimit" name="smsSendLimit" value="<%= user.smsSendLimit %>" min="0" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Update User</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
