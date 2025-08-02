@@ -1,47 +1,79 @@
-// Inside your /send-bulk route
-const { getClient } = require('../whatsappManager');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- Hamari main CSS file -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script> <!-- Socket.IO client -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script> <!-- QR Code generator -->
+</head>
+<body>
 
-const numbers = ['923...', '923...', ...]; // From request
-const message = "Your message here";
-const userSettings = { msgsPerDevice: 50, delayBetweenDevices: 60 }; // in seconds
+    <header class="main-header">
+        <h1>WhatsApp Sender</h1>
+        <div class="user-info">
+            <span>Welcome, <%= user.username %>!</span>
+            <a href="/auth/logout" class="btn-logout">Logout</a>
+        </div>
+    </header>
 
-const userDevices = await Device.find({ userId: req.session.userId, status: 'ready' });
-if (userDevices.length === 0) {
-    return res.status(400).send("No active devices found.");
-}
+    <main class="dashboard-container">
+        <!-- User Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Plan Expiry</h3>
+                <p><%= new Date(user.expiryDate).toLocaleDateString() %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Device Limit</h3>
+                <p><%= devices.length %> / <%= user.deviceLimit %></p>
+            </div>
+            <div class="stat-card">
+                <h3>SMS Sent (Today)</h3>
+                <p>0 / <%= user.smsSendLimit %></p>
+            </div>
+        </div>
 
-let deviceIndex = 0;
-let messageCount = 0;
+        <!-- Devices Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Your Devices</h2>
+                <button id="add-device-btn" class="btn-primary">Add New Device</button>
+            </div>
+            <div class="device-list">
+                <% if(devices.length === 0) { %>
+                    <p>No devices added yet. Click 'Add New Device' to get started.</p>
+                <% } else { %>
+                    <% devices.forEach(device => { %>
+                        <div class="device-item" data-session-id="<%= device.sessionId %>">
+                            <span class="device-number"><%= device.phoneNumber || 'Not Authenticated' %></span>
+                            <span class="device-status status-<%= device.status %>" id="status-<%= device.sessionId %>">
+                                <%= device.status %>
+                            </span>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </div>
 
-for (const number of numbers) {
-    // Get the current device
-    const currentDeviceSessionId = userDevices[deviceIndex].sessionId;
-    const client = getClient(currentDeviceSessionId);
-    
-    if (client) {
-        try {
-            // Add a random delay between messages to look more human
-            const randomDelay = Math.floor(Math.random() * (15 - 5 + 1) + 5) * 1000; // 5-15 seconds
-            await new Promise(resolve => setTimeout(resolve, randomDelay));
-            
-            // Format number correctly (e.g., 923... to 923...@c.us)
-            const chatId = `${number.replace(/\D/g, '')}@c.us`;
-            await client.sendMessage(chatId, message);
-            console.log(`Message sent to ${number} from ${currentDeviceSessionId}`);
-            messageCount++;
+        <!-- TODO: Add Messaging Forms Here -->
 
-            // Check if we need to switch the device
-            if (messageCount >= userSettings.msgsPerDevice) {
-                console.log(`Switching device. Waiting for ${userSettings.delayBetweenDevices} seconds...`);
-                await new Promise(resolve => setTimeout(resolve, userSettings.delayBetweenDevices * 1000));
-                
-                messageCount = 0; // Reset counter
-                deviceIndex = (deviceIndex + 1) % userDevices.length; // Move to the next device
-            }
+    </main>
 
-        } catch (err) {
-            console.error(`Failed to send to ${number}:`, err);
-        }
-    }
-}
-res.send("Bulk sending process completed.");
+    <!-- QR Code Modal -->
+    <div id="qr-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal">×</span>
+            <h3>Scan QR Code</h3>
+            <p>Scan this code with your WhatsApp app to connect your device.</p>
+            <div id="qrcode-container">
+                <!-- QR code will be generated here -->
+            </div>
+            <p id="qr-message">Waiting for QR code...</p>
+        </div>
+    </div>
+
+    <script src="/js/dashboard.js"></script> <!-- Hamari dashboard ki JS file -->
+</body>
+</html>
