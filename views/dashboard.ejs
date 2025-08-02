@@ -1,0 +1,47 @@
+// Inside your /send-bulk route
+const { getClient } = require('../whatsappManager');
+
+const numbers = ['923...', '923...', ...]; // From request
+const message = "Your message here";
+const userSettings = { msgsPerDevice: 50, delayBetweenDevices: 60 }; // in seconds
+
+const userDevices = await Device.find({ userId: req.session.userId, status: 'ready' });
+if (userDevices.length === 0) {
+    return res.status(400).send("No active devices found.");
+}
+
+let deviceIndex = 0;
+let messageCount = 0;
+
+for (const number of numbers) {
+    // Get the current device
+    const currentDeviceSessionId = userDevices[deviceIndex].sessionId;
+    const client = getClient(currentDeviceSessionId);
+    
+    if (client) {
+        try {
+            // Add a random delay between messages to look more human
+            const randomDelay = Math.floor(Math.random() * (15 - 5 + 1) + 5) * 1000; // 5-15 seconds
+            await new Promise(resolve => setTimeout(resolve, randomDelay));
+            
+            // Format number correctly (e.g., 923... to 923...@c.us)
+            const chatId = `${number.replace(/\D/g, '')}@c.us`;
+            await client.sendMessage(chatId, message);
+            console.log(`Message sent to ${number} from ${currentDeviceSessionId}`);
+            messageCount++;
+
+            // Check if we need to switch the device
+            if (messageCount >= userSettings.msgsPerDevice) {
+                console.log(`Switching device. Waiting for ${userSettings.delayBetweenDevices} seconds...`);
+                await new Promise(resolve => setTimeout(resolve, userSettings.delayBetweenDevices * 1000));
+                
+                messageCount = 0; // Reset counter
+                deviceIndex = (deviceIndex + 1) % userDevices.length; // Move to the next device
+            }
+
+        } catch (err) {
+            console.error(`Failed to send to ${number}:`, err);
+        }
+    }
+}
+res.send("Bulk sending process completed.");
