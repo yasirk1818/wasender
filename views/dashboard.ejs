@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="/css/style.css"> <!-- Hamari main CSS file -->
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script> <!-- Socket.IO client -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script> <!-- QR Code generator -->
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -35,45 +35,97 @@
             </div>
         </div>
 
-        <!-- Devices Section -->
-        <div class="card">
-            <div class="card-header">
-                <h2>Your Devices</h2>
-                <button id="add-device-btn" class="btn-primary">Add New Device</button>
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Left Column: Devices and Messaging -->
+            <div class="main-column">
+                <!-- Start: Messaging Section -->
+                <div id="message-status" style="display:none;"></div>
+
+                <!-- Single Message Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Send Single Message</h2>
+                    </div>
+                    <div class="card-content">
+                        <form id="single-message-form">
+                            <div class="input-group">
+                                <label for="single-number">Recipient Number (e.g., 923001234567)</label>
+                                <input type="text" id="single-number" name="number" placeholder="Enter number with country code" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="single-message">Message</label>
+                                <textarea id="single-message" name="message" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Bulk Message Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Send Bulk Messages</h2>
+                    </div>
+                    <div class="card-content">
+                        <form id="bulk-message-form">
+                            <div class="input-group">
+                                <label for="bulk-numbers">Recipient Numbers (one per line)</label>
+                                <textarea id="bulk-numbers" name="numbers" rows="6" placeholder="923001234567
+923129876543
+923331122334" required></textarea>
+                            </div>
+                            <div class="input-group">
+                                <label for="bulk-message">Message</label>
+                                <textarea id="bulk-message" name="message" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">Start Bulk Sending</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- End: Messaging Section -->
             </div>
-            <div class="device-list">
-                <% if(devices.length === 0) { %>
-                    <p>No devices added yet. Click 'Add New Device' to get started.</p>
-                <% } else { %>
-                    <% devices.forEach(device => { %>
-                        <div class="device-item" data-session-id="<%= device.sessionId %>">
-                            <span class="device-number"><%= device.phoneNumber || 'Not Authenticated' %></span>
-                            <span class="device-status status-<%= device.status %>" id="status-<%= device.sessionId %>">
-                                <%= device.status %>
-                            </span>
-                        </div>
-                    <% }) %>
-                <% } %>
+
+            <!-- Right Column: Devices -->
+            <div class="sidebar-column">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Your Devices</h2>
+                        <button id="add-device-btn" class="btn-primary">Add Device</button>
+                    </div>
+                    <div class="device-list">
+                        <% if(devices.length === 0) { %>
+                            <p class="empty-state">No devices added yet.</p>
+                        <% } else { %>
+                            <% devices.forEach(device => { %>
+                                <div class="device-item" data-session-id="<%= device.sessionId %>">
+                                    <div class="device-info">
+                                        <span class="device-icon">📱</span>
+                                        <span class="device-number"><%= device.phoneNumber || 'Not Authenticated' %></span>
+                                    </div>
+                                    <span class="device-status status-<%= device.status %>" id="status-<%= device.sessionId %>">
+                                        <%= device.status %>
+                                    </span>
+                                </div>
+                            <% }) %>
+                        <% } %>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- TODO: Add Messaging Forms Here -->
-
     </main>
 
-    <!-- QR Code Modal -->
+    <!-- QR Code Modal (No change here) -->
     <div id="qr-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <span class="close-modal">×</span>
             <h3>Scan QR Code</h3>
             <p>Scan this code with your WhatsApp app to connect your device.</p>
-            <div id="qrcode-container">
-                <!-- QR code will be generated here -->
-            </div>
+            <div id="qrcode-container"></div>
             <p id="qr-message">Waiting for QR code...</p>
         </div>
     </div>
 
-    <script src="/js/dashboard.js"></script> <!-- Hamari dashboard ki JS file -->
+    <script src="/js/dashboard.js"></script>
 </body>
 </html>
