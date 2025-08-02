@@ -452,3 +452,9 @@ select {
         border-bottom: 1px solid var(--border-color);
     }
 }
+/* --- Settings Page Helper --- */
+.input-help {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
