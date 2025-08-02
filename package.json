@@ -1,0 +1,32 @@
+{
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.1",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "mongoose": "^8.17.0",
+    "puppeteer": "^24.15.0",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.1",
+    "whatsapp-web.js": "^1.31.0"
+  },
+  "name": "wasender",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yasirk1818/wasender.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yasirk1818/wasender/issues"
+  },
+  "homepage": "https://github.com/yasirk1818/wasender#readme",
+  "description": ""
+}
