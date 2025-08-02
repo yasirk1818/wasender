@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     },
     role: { 
         type: String, 
-        enum: ['user', 'admin'], // Sirf ye do values ho skti hain
+        enum: ['user', 'admin'],
         default: 'user' 
     },
     status: { 
@@ -32,7 +32,16 @@ const userSchema = new mongoose.Schema({
     smsSendLimit: { 
         type: Number, 
         default: 1000 
+    },
+    // --- NEW SETTINGS FIELDS ---
+    messagesPerDevice: {
+        type: Number,
+        default: 30 // Default: 30 messages per device before switching
+    },
+    deviceSwitchDelay: {
+        type: Number,
+        default: 60 // Default: 60 seconds delay before using the next device
     }
-}, { timestamps: true }); // createdAt aur updatedAt ki fields automatically add kr dega
+}, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
