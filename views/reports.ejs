@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Reports</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <h1>Message Reports</h1>
+        <div>
+            <!-- PDF EXPORT KA BUTTON (Agli step me kaam karega) -->
+            <a href="/reports/export-pdf" class="btn-primary" target="_blank">Export as PDF</a>
+            <a href="/dashboard" class="btn-secondary">Back to Dashboard</a>
+        </div>
+    </header>
+    <main class="dashboard-container">
+        <div class="card">
+            <div class="card-content">
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>To</th>
+                                <th>From (Device)</th>
+                                <th>Status</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if(logs.length === 0) { %>
+                                <tr>
+                                    <td colspan="5" style="text-align: center;">No reports to show.</td>
+                                </tr>
+                            <% } else { %>
+                                <% logs.forEach(log => { %>
+                                    <tr>
+                                        <td data-label="Date"><%= new Date(log.createdAt).toLocaleString() %></td>
+                                        <td data-label="To"><%= log.sentTo %></td>
+                                        <td data-label="From (Device)"><%= log.sentFrom %></td>
+                                        <td data-label="Status">
+                                            <span class="device-status status-<%= log.status === 'sent' ? 'ready' : 'error' %>">
+                                                <%= log.status %>
+                                            </span>
+                                        </td>
+                                        <td data-label="Message" title="<%= log.message %>">
+                                            <%= log.message.substring(0, 30) + (log.message.length > 30 ? '...' : '') %>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
