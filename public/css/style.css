@@ -458,3 +458,58 @@ select {
     color: var(--text-muted);
     margin-top: 8px;
 }
+/* --- Device Action Buttons --- */
+.device-item {
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+}
+
+.device-info {
+    flex-grow: 1; /* Allow info to take available space */
+}
+
+.device-info > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.device-number {
+    font-weight: bold;
+}
+
+.device-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px; /* Add some space on mobile */
+    margin-left: 50px; /* Align with icon on desktop */
+}
+
+@media (min-width: 768px) {
+    .device-actions {
+        margin-top: 0;
+        margin-left: auto; /* Push buttons to the far right on desktop */
+    }
+}
+
+.device-actions button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.device-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-reconnect {
+    background-color: #0d6efd; /* Blue */
+    color: white;
+}
+
+.btn-delete {
+    background-color: var(--error-color); /* Red */
+    color: white;
+}
