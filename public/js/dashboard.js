@@ -3,14 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Step 1: Check for required libraries ---
     if (typeof io === 'undefined' || typeof QRCode === 'undefined') {
-        console.error('CRITICAL ERROR: A required library (Socket.IO or QRCode.js) is not loaded!');
-        return; // Stop script execution
+        console.error('CRITICAL ERROR: A required library (Socket.IO or QRCode.js) is not loaded! Check script tags in your HTML.');
+        alert('Application cannot start. A required library is missing.');
+        return; // Script ko aage chalne se rok den
     }
 
     // --- Step 2: Initialize Socket.IO ---
     const socket = io();
-    socket.on('connect', () => { console.log('%cSocket.IO Connected Successfully!', 'color: green;'); });
-    socket.on('connect_error', (err) => { console.error('%cSocket.IO Connection Failed!', 'color: red;', err); });
+    socket.on('connect', () => { console.log('%cSocket.IO Connected Successfully!', 'color: green; font-weight: bold;'); });
+    socket.on('connect_error', (err) => { console.error('%cSocket.IO Connection Failed!', 'color: red; font-weight: bold;', err); });
 
     // --- Step 3: Select all HTML Elements (Sirf aik baar) ---
     const addDeviceBtn = document.getElementById('add-device-btn');
@@ -37,10 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // === A. "ADD DEVICE" BUTTON CLICK (MUKAMMAL LOGIC) ===
     if (addDeviceBtn) {
         addDeviceBtn.addEventListener('click', async () => {
+            console.log("Add Device button clicked!");
             if (!qrModal) return console.error('QR Modal not found in HTML.');
             
             qrContainer.innerHTML = '';
-            qrMessage.textContent = 'Requesting QR code...';
+            qrMessage.textContent = 'Requesting QR code from server...';
             qrModal.style.display = 'flex';
 
             try {
@@ -51,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error('Add device fetch error:', error);
-                qrMessage.textContent = 'Error: Could not communicate with server.';
+                qrMessage.textContent = 'Error: Could not communicate with the server.';
             }
         });
     }
@@ -72,16 +74,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!sessionId) return;
 
             if (target.classList.contains('btn-reconnect')) {
+                console.log(`Reconnect button clicked for ${sessionId}`);
+                qrContainer.innerHTML = '';
                 qrModal.style.display = 'flex';
                 qrMessage.textContent = 'Requesting QR for reconnection...';
                 await fetch('/dashboard/reconnect-device', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId }) });
             }
 
             if (target.classList.contains('btn-delete')) {
+                console.log(`Delete button clicked for ${sessionId}`);
                 if (confirm('Are you sure you want to delete this device permanently?')) {
                     const response = await fetch('/dashboard/delete-device', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId }) });
-                    if (response.ok) { window.location.reload(); } 
-                    else { alert('Failed to delete device.'); }
+                    if (response.ok) { 
+                        alert('Device deleted successfully.');
+                        window.location.reload(); 
+                    } else { 
+                        alert('Failed to delete device.'); 
+                    }
                 }
             }
         });
