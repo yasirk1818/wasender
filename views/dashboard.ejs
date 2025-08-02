@@ -9,11 +9,11 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 </head>
 <body>
-
     <header class="main-header">
         <h1>WhatsApp Sender</h1>
         <div class="user-info">
-            <!-- Updated Part: Show Admin Panel Link if user is admin -->
+            <!-- NEW: Settings Link -->
+            <a href="/settings" class="btn-secondary">Settings</a>
             <% if (user.role === 'admin') { %>
                 <a href="/admin/users" class="btn-secondary">Admin Panel</a>
             <% } %>
@@ -41,77 +41,38 @@
 
         <!-- Main Content Grid -->
         <div class="main-grid">
-            <!-- Left Column: Devices and Messaging -->
+            <!-- Left Column: Messaging -->
             <div class="main-column">
-                <!-- Status Message Area -->
                 <div id="message-status" style="display:none;"></div>
-
-                <!-- Single Message Card -->
                 <div class="card">
-                    <div class="card-header">
-                        <h2>Send Single Message</h2>
-                    </div>
+                    <div class="card-header"><h2>Send Single Message</h2></div>
                     <div class="card-content">
                         <form id="single-message-form">
-                            <div class="input-group">
-                                <label for="single-number">Recipient Number (e.g., 923001234567)</label>
-                                <input type="text" id="single-number" name="number" placeholder="Enter number with country code" required>
-                            </div>
-                            <div class="input-group">
-                                <label for="single-message">Message</label>
-                                <textarea id="single-message" name="message" rows="4" required></textarea>
-                            </div>
+                            <div class="input-group"><label for="single-number">Recipient Number (e.g., 923001234567)</label><input type="text" id="single-number" name="number" placeholder="Enter number with country code" required></div>
+                            <div class="input-group"><label for="single-message">Message</label><textarea id="single-message" name="message" rows="4" required></textarea></div>
                             <button type="submit" class="btn-primary">Send Message</button>
                         </form>
                     </div>
                 </div>
-
-                <!-- Bulk Message Card -->
                 <div class="card">
-                    <div class="card-header">
-                        <h2>Send Bulk Messages</h2>
-                    </div>
+                    <div class="card-header"><h2>Send Bulk Messages</h2></div>
                     <div class="card-content">
                         <form id="bulk-message-form">
-                            <div class="input-group">
-                                <label for="bulk-numbers">Recipient Numbers (one per line)</label>
-                                <textarea id="bulk-numbers" name="numbers" rows="6" placeholder="923001234567
+                            <div class="input-group"><label for="bulk-numbers">Recipient Numbers (one per line)</label><textarea id="bulk-numbers" name="numbers" rows="6" placeholder="923001234567
 923129876543
-923331122334" required></textarea>
-                            </div>
-                            <div class="input-group">
-                                <label for="bulk-message">Message</label>
-                                <textarea id="bulk-message" name="message" rows="4" required></textarea>
-                            </div>
+923331122334" required></textarea></div>
+                            <div class="input-group"><label for="bulk-message">Message</label><textarea id="bulk-message" name="message" rows="4" required></textarea></div>
                             <button type="submit" class="btn-primary">Start Bulk Sending</button>
                         </form>
                     </div>
                 </div>
             </div>
-
             <!-- Right Column: Devices -->
             <div class="sidebar-column">
                 <div class="card">
-                    <div class="card-header">
-                        <h2>Your Devices</h2>
-                        <button id="add-device-btn" class="btn-primary">Add Device</button>
-                    </div>
+                    <div class="card-header"><h2>Your Devices</h2><button id="add-device-btn" class="btn-primary">Add Device</button></div>
                     <div class="device-list">
-                        <% if(devices.length === 0) { %>
-                            <p class="empty-state">No devices added yet.</p>
-                        <% } else { %>
-                            <% devices.forEach(device => { %>
-                                <div class="device-item" data-session-id="<%= device.sessionId %>">
-                                    <div class="device-info">
-                                        <span class="device-icon">📱</span>
-                                        <span class="device-number"><%= device.phoneNumber || 'Not Authenticated' %></span>
-                                    </div>
-                                    <span class="device-status status-<%= device.status %>" id="status-<%= device.sessionId %>">
-                                        <%= device.status %>
-                                    </span>
-                                </div>
-                            <% }) %>
-                        <% } %>
+                        <% if(devices.length === 0) { %><p class="empty-state">No devices added yet.</p><% } else { %><% devices.forEach(device => { %><div class="device-item" data-session-id="<%= device.sessionId %>"><div class="device-info"><span class="device-icon">📱</span><span class="device-number"><%= device.phoneNumber || 'Not Authenticated' %></span></div><span class="device-status status-<%= device.status %>" id="status-<%= device.sessionId %>"><%= device.status %></span></div><% }) %><% } %>
                     </div>
                 </div>
             </div>
@@ -119,16 +80,7 @@
     </main>
 
     <!-- QR Code Modal -->
-    <div id="qr-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <span class="close-modal">×</span>
-            <h3>Scan QR Code</h3>
-            <p>Scan this code with your WhatsApp app to connect your device.</p>
-            <div id="qrcode-container"></div>
-            <p id="qr-message">Waiting for QR code...</p>
-        </div>
-    </div>
-
+    <div id="qr-modal" class="modal-overlay" style="display: none;"><div class="modal-content"><span class="close-modal">×</span><h3>Scan QR Code</h3><p>Scan this code with your WhatsApp app to connect your device.</p><div id="qrcode-container"></div><p id="qr-message">Waiting for QR code...</p></div></div>
     <script src="/js/dashboard.js"></script>
 </body>
 </html>
