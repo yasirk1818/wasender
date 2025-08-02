@@ -1,42 +1,69 @@
-// whatsappManager.js
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const socket = require('./socket'); // Socket.io instance
+const Device = require('./models/Device'); // DB Model
 
-// Key: sessionId (e.g., 'user123_device1'), Value: WhatsApp Client instance
+// Key: sessionId, Value: WhatsApp Client instance
 const clients = new Map();
 
-function initializeClient(sessionId) {
-    if (clients.has(sessionId)) return; // Already initialized
+async function initializeClient(sessionId) {
+    if (clients.has(sessionId)) {
+        console.log(`Client ${sessionId} is already initializing or ready.`);
+        return;
+    }
 
+    console.log(`Initializing client for session: ${sessionId}`);
     const client = new Client({
         authStrategy: new LocalAuth({ clientId: sessionId, dataPath: './sessions' }),
-        puppeteer: { headless: true, args: ['--no-sandbox'] }
-    });
-
-    client.on('qr', (qr) => {
-        // QR code ko frontend pr bhejen
-        console.log(`QR for ${sessionId}:`, qr);
-        socket.getIO().emit('qr_code', { sessionId, qr });
-        // DB me status update krein -> 'needs_qr'
-    });
-
-    client.on('ready', () => {
-        console.log(`${sessionId} is ready!`);
-        clients.set(sessionId, client);
-        // DB me status update krein -> 'ready'
-        // Aur phone number bhi save kr len client.info.wid.user
-        socket.getIO().emit('client_ready', { sessionId });
+        puppeteer: { 
+            headless: true, // Server pr true hi hona chahiye
+            args: ['--no-sandbox', '--disable-setuid-sandbox'] // Server pr zaroori args
+        }
     });
     
-    client.on('disconnected', (reason) => {
-        console.log(`${sessionId} disconnected!`, reason);
-        clients.delete(sessionId);
-        // DB me status update krein -> 'disconnected'
+    // Client ko map me daal den taake dobara na banayen
+    clients.set(sessionId, client);
+
+    client.on('qr', async (qr) => {
+        console.log(`QR code received for ${sessionId}`);
+        // QR code ko frontend pr bhejen
+        socket.getIO().emit('qr_code', { sessionId, qr });
+        // DB me status update krein
+        await Device.findOneAndUpdate({ sessionId }, { status: 'needs_qr' });
     });
 
-    client.initialize();
+    client.on('ready', async () => {
+        console.log(`Client for ${sessionId} is ready!`);
+        clients.set(sessionId, client); // Ensure it's set on ready
+        const phoneNumber = client.info.wid.user;
+        // DB me status aur phone number update krein
+        await Device.findOneAndUpdate({ sessionId }, { status: 'ready', phoneNumber: phoneNumber });
+        // Frontend ko batayen k client ready hai
+        socket.getIO().emit('client_ready', { sessionId, phoneNumber });
+    });
+    
+    client.on('disconnected', async (reason) => {
+        console.log(`Client for ${sessionId} was disconnected.`, reason);
+        clients.delete(sessionId);
+        await Device.findOneAndUpdate({ sessionId }, { status: 'disconnected' });
+        socket.getIO().emit('client_disconnected', { sessionId });
+    });
+
+    client.on('auth_failure', async (msg) => {
+        console.error(`Authentication failure for ${sessionId}:`, msg);
+        clients.delete(sessionId);
+        await Device.findOneAndUpdate({ sessionId }, { status: 'error' });
+    });
+    
+    try {
+        await client.initialize();
+    } catch (error) {
+        console.error(`Failed to initialize client ${sessionId}:`, error);
+        clients.delete(sessionId);
+        await Device.findOneAndUpdate({ sessionId }, { status: 'error' });
+    }
 }
 
+// Function to get an active client
 function getClient(sessionId) {
     return clients.get(sessionId);
 }
